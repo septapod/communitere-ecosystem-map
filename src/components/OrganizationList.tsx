@@ -31,11 +31,6 @@ export function OrganizationList({ organizations, totalCount }: OrganizationList
     setIsOpen(true);
   };
 
-  const closeModal = () => {
-    setIsOpen(false);
-    setSelectedOrg(null);
-  };
-
   if (organizations.length === 0) {
     return (
       <Card className="bg-white shadow-md">
