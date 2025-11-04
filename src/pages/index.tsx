@@ -135,7 +135,16 @@ export default function Home() {
                 label="Category"
                 placeholder="All Categories"
                 selectedKeys={selectedCategory}
-                onSelectionChange={setSelectedCategory}
+                onSelectionChange={(keys) => {
+                  // Handle NextUI's SharedSelection type
+                  if (keys === 'all') {
+                    // User selected all categories
+                    setSelectedCategory(new Set(categories));
+                  } else {
+                    // Convert Selection (Set<Key>) to Set<string>
+                    setSelectedCategory(new Set(Array.from(keys).map(String)));
+                  }
+                }}
                 className="w-full"
               >
                 {categories.map((cat) => (
@@ -150,7 +159,16 @@ export default function Home() {
                 label="Scope"
                 placeholder="All Scopes"
                 selectedKeys={selectedScope}
-                onSelectionChange={setSelectedScope}
+                onSelectionChange={(keys) => {
+                  // Handle NextUI's SharedSelection type
+                  if (keys === 'all') {
+                    // User selected all scopes
+                    setSelectedScope(new Set(scopes));
+                  } else {
+                    // Convert Selection (Set<Key>) to Set<string>
+                    setSelectedScope(new Set(Array.from(keys).map(String)));
+                  }
+                }}
                 className="w-full"
               >
                 {scopes.map((scope) => (
