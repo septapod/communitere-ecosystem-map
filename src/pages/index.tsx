@@ -184,8 +184,8 @@ export default function Home() {
         {/* Tabs for List and Map Views */}
         <Tabs
           aria-label="View options"
-          activeKey={activeTab}
-          onSelectionChange={setActiveTab}
+          selectedKey={activeTab}
+          onSelectionChange={(key) => setActiveTab(key as string | number)}
           classNames={{
             tabList: 'gap-6 w-full rounded-lg bg-white p-4 shadow-md',
             cursor: 'w-full bg-indigo-600',
