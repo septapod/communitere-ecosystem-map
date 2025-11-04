@@ -41,6 +41,7 @@ export function OrganizationList({ organizations, totalCount }: OrganizationList
       <Card className="bg-white shadow-md">
         <CardBody className="p-12 text-center">
           <p className="text-gray-600 text-lg">No organizations found matching your filters.</p>
+          <p className="text-sm text-gray-500 mt-2">({totalCount} total in database)</p>
         </CardBody>
       </Card>
     );
