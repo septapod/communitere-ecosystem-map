@@ -51,15 +51,16 @@ export const searchOrganizations = async (query: string): Promise<Organization[]
 export const getCategories = async (): Promise<string[]> => {
   const { data, error } = await supabase
     .from('organizations')
-    .select('category')
-    .distinct();
+    .select('category');
 
   if (error) {
     console.error('Error fetching categories:', error);
     return [];
   }
 
-  return data ? data.map((item) => item.category).filter(Boolean) as string[] : [];
+  // Deduplicate in JavaScript and filter out nulls
+  const categories = data ? data.map((item) => item.category).filter(Boolean) : [];
+  return Array.from(new Set(categories)) as string[];
 };
 
 export const addOrganization = async (org: Omit<Organization, 'id' | 'created_at' | 'updated_at'>) => {
