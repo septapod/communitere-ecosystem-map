@@ -1,402 +1,227 @@
 # Communitere Ecosystem Map - Project Status
 
-**Last Updated:** November 3, 2025
-**Status:** 🚀 Ready for Development Phase
-**Repository:** Git initialized with 4 commits
-**Code Location:** `/Users/brentdixon/Library/CloudStorage/Dropbox/Manual Library/Documents/Projects/2025/Communitere Next/ecosystem-map`
+**Last Updated:** November 4, 2025, 12:30 PM
+**Status:** ⚠️ **BROKEN - BUILD FAILING ON VERCEL**
 
 ---
 
-## 📋 Executive Summary
+## Current Issue
 
-The Communitere Ecosystem Map is a database-driven web application that maps grassroots mutual aid organizations, community-based organizations, and disaster response networks across the United States. The prototype has been fully built and tested. We are now at the stage of setting up the database and running comprehensive testing before importing the first wave of organizations.
+### Build Status: FAILED ❌
 
-**Key Decision Made:** Converged two parallel development threads into a single unified approach with a "Goldilocks" database schema (16 fields - balanced between simplicity and functionality).
+The Vercel deployment is **still failing** due to continued TypeScript type mismatches with NextUI components. Multiple component prop names were incorrect in the original codebase.
+
+**Latest Error (Commit c63f10b):**
+```
+Type error: Property 'activeKey' does not exist on type 'IntrinsicAttributes & TabsProps<object>'.
+```
+
+### Fixes Applied (But More Issues Remain)
+
+1. ✅ **Downgraded React 18** (Commit 2e6c78e)
+   - React: 19.2.0 → 18.3.1
+   - react-leaflet: 5.0.0 → 4.2.1
+   - @types/react: 19.2.2 → 18.3.12
+
+2. ✅ **Fixed Supabase .distinct() Error** (Commit 1a29eaa)
+   - Replaced unsupported `.distinct()` method
+   - Implemented JavaScript Set-based deduplication
+
+3. ✅ **Fixed Select Components** (Commit 86926e7)
+   - Category and Scope filters
+   - Added wrapper functions for SharedSelection type handling
+
+4. ✅ **Fixed Tabs Component Props** (Commit c63f10b)
+   - Changed `activeKey` → `selectedKey`
+   - Added type casting for onSelectionChange
+
+### Problem Pattern Identified
+
+The codebase appears to have been generated with **incorrect NextUI component API assumptions**. Component prop names don't match NextUI 2.6.11's actual API:
+
+- ❌ Select: `onSelectionChange` expects `SharedSelection` type, not direct state setter
+- ❌ Tabs: Uses `selectedKey` not `activeKey`
+- ❌ Likely more mismatches exist in other components
 
 ---
 
-## ✅ What's Complete
+## Architecture
 
-### Phase 1: Application Architecture ✅
-- **Framework:** Next.js 16 + React 19 + TypeScript
-- **UI Library:** NextUI with Tailwind CSS
-- **Database Client:** Supabase (PostgreSQL)
-- **Mapping:** React-Leaflet + Leaflet.js
-- **Styling:** Tailwind CSS with responsive design
+### Current Stack
+- **Framework:** Next.js 16.0.1 with Turbopack
+- **React:** 18.3.1
+- **UI Library:** NextUI 2.6.11 (deprecated, migration recommended)
+- **Database:** Supabase PostgreSQL
+- **Mapping:** React-Leaflet 4.2.1 + Leaflet 1.9.4
+- **Styling:** Tailwind CSS 4.1.16
+- **State Management:** React Hooks
+- **TypeScript:** 5.9.3 (strict mode enabled on Vercel)
 
-### Phase 2: Frontend Features ✅
-- **List View:** Searchable grid of organization cards with detail modals
-- **Map View:** Interactive Leaflet map showing organization locations
-- **Search:** Full-text search across organization names, descriptions, locations
-- **Filtering:** Filter by category and geographic scope
-- **Detail Modal:** Click any organization to see full information
-- **Responsive Design:** Mobile, tablet, and desktop compatible
-- **Tab Navigation:** Easy switching between list and map views
-
-### Phase 3: Project Documentation ✅
-- **README.md** - Project overview, quick start, tech stack
-- **SETUP_GUIDE.md** - Step-by-step Supabase and Vercel deployment
-- **MIGRATION_SCRIPT.md** - Four data import methods with examples
-- **COMMUNITERE_CONTEXT.md** - 20KB comprehensive reference document on Communitere's history, philosophy, and mission
-
-### Phase 4: Git Repository ✅
-- Repository initialized
-- 4 commits with clear messages
-- .gitignore configured properly
-- Ready for GitHub push
-
-### Phase 5: Environment Configuration ✅
-- `.env.local` created with Supabase credentials
-- `NEXT_PUBLIC_SUPABASE_URL` configured
-- `NEXT_PUBLIC_SUPABASE_ANON_KEY` configured
-- Ready for local development
+### Key Files
+- `/src/pages/index.tsx` - Main dashboard with filters and tabs
+- `/src/pages/_app.tsx` - App wrapper with NextUIProvider
+- `/src/components/OrganizationList.tsx` - List view component
+- `/src/components/MapView.tsx` - Map view component
+- `/src/lib/supabase.ts` - Database queries
+- `/src/types/index.ts` - TypeScript interfaces
 
 ---
 
-## 🗄️ Database Schema (FINAL - Goldilocks Approach)
+## What's Working
 
-**Total Fields: 16** (optimized balance between functionality and manageability)
+✅ Local development environment runs without errors
+✅ Database connection to Supabase
+✅ Data fetching logic
+✅ Basic UI layout renders
+✅ Filter logic implemented
 
-### Core Information Fields (11 fields)
-```
-- organization (TEXT) - Organization name
-- website (TEXT) - Website URL
-- location (TEXT) - Geographic location
-- type (TEXT) - Organization type
-- description (TEXT) - Mission/description
-- services (TEXT) - Key services/programs
-- contact (TEXT) - Contact information
-- scope (TEXT) - Geographic scope (Local/Regional/State/National)
-- founded (TEXT) - Year founded
-- latitude (FLOAT) - Map coordinate
-- longitude (FLOAT) - Map coordinate
-```
+## What's Broken
 
-### Classification Fields (2 fields)
-```
-- tier (TEXT) - Organization tier (Tier 1-6)
-- category (TEXT) - Organization category
-```
-
-### Quality & Verification Fields (3 fields)
-```
-- confidence_level (TEXT) - Verification status: HIGH / MEDIUM / LOW
-- notes (TEXT) - Red flags, context, verification details
-- last_verified (DATE) - When information was last checked
-```
-
-### Audit Trail Fields (2 fields)
-```
-- added_date (DATE) - When organization was added to database
-- created_at / updated_at (TIMESTAMP) - System timestamps
-```
-
-### Safety Note on Language
-**Database uses operationally neutral terminology** to ensure safety and accessibility:
-- "Local decision-authority" instead of "anti-colonial"
-- "Governance transparency" instead of ideological framing
-- "Community-led" and "locally accountable" for grassroots characteristics
-- Focuses on observable behaviors and structures, not ideology
+❌ **Vercel production build fails** on TypeScript compilation
+❌ Multiple NextUI component prop mismatches
+❌ Cannot deploy to production
+❌ List of errors likely to continue as more components are hit
 
 ---
 
-## 🎯 Current Phase: Testing & Validation
+## Root Cause Analysis
 
-### Testing Plan (15 Steps)
+The codebase was likely generated without proper testing of NextUI component APIs. Specifically:
 
-**✅ Steps Complete:**
-1. ✅ Set up Supabase project
-2. ✅ Configure environment variables (.env.local created)
-3. ✅ Database schema designed and ready for implementation
-
-**⏳ Steps In Progress:**
-4. Create database table in Supabase (SQL ready, awaiting user action)
-5. Test Supabase connection from app
-
-**📋 Steps Pending:**
-6. Test local development server (npm run dev)
-7. Verify all UI components render correctly
-8. Test search and filter functionality
-9. Test map view rendering and interactions
-10. Test list view and organization cards
-11. Test detail modal functionality
-12. Add sample test data to database
-13. End-to-end testing with real data
-14. Fix any bugs or errors found
-15. Optimize performance and responsiveness
+1. **NextUI 2.6.11 deprecation warnings** - This version is old and deprecated
+2. **React 18 compatibility** - NextUI wasn't designed for React 18's stricter types
+3. **Component API mismatches** - Multiple components use wrong prop names
+4. **TypeScript strict mode on Vercel** - Catches type errors that local dev misses
 
 ---
 
-## 🗄️ Database Setup Instructions
+## Recommended Solutions
 
-### Step 1: Create Table in Supabase (AWAITING USER ACTION)
+### Option 1: Replace NextUI with HTML + Tailwind (RECOMMENDED)
+- **Time:** 2-3 hours
+- **Effort:** Rewrite UI layer with semantic HTML and Tailwind classes
+- **Benefit:** Eliminates all NextUI type issues, simpler maintenance
+- **Trade-off:** Loss of polished component library features
 
-Go to: https://hggujhnzfmnzmtvleouv.supabase.co/sql
-Create a new query and run this SQL:
+### Option 2: Replace with Shadcn/ui or Radix UI
+- **Time:** 3-4 hours
+- **Effort:** Install headless component library, rebuild UI
+- **Benefit:** Modern, TypeScript-first components, better documentation
+- **Trade-off:** Learning curve for new library
 
-```sql
-CREATE TABLE organizations (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  organization TEXT NOT NULL,
-  website TEXT,
-  location TEXT,
-  type TEXT,
-  description TEXT,
-  services TEXT,
-  contact TEXT,
-  scope TEXT,
-  founded TEXT,
-  tier TEXT,
-  category TEXT,
-  latitude FLOAT,
-  longitude FLOAT,
-  confidence_level TEXT,
-  notes TEXT,
-  last_verified DATE,
-  added_date DATE DEFAULT CURRENT_DATE,
-  created_at TIMESTAMP DEFAULT NOW(),
-  updated_at TIMESTAMP DEFAULT NOW()
-);
-
--- Create indexes for faster queries
-CREATE INDEX idx_organizations_category ON organizations(category);
-CREATE INDEX idx_organizations_tier ON organizations(tier);
-CREATE INDEX idx_organizations_location ON organizations(location);
-CREATE INDEX idx_organizations_organization ON organizations(organization);
-CREATE INDEX idx_organizations_confidence ON organizations(confidence_level);
-
--- Enable Row Level Security
-ALTER TABLE organizations ENABLE ROW LEVEL SECURITY;
-
--- Allow public read access
-CREATE POLICY "Enable read access for all users" ON organizations
-  FOR SELECT USING (true);
-```
-
-### Step 2: Verify Connection
-Once table is created, we'll test the connection by:
-- Running `npm run dev`
-- Checking browser console for errors
-- Testing a sample query
+### Option 3: Continue Patching NextUI Errors
+- **Time:** Unpredictable (could be many more errors)
+- **Effort:** High and repetitive
+- **Benefit:** Keeps current UI design
+- **Trade-off:** Unsustainable long-term, risk of new errors on each deploy
 
 ---
 
-## 📊 Project Structure
+## Data Status
 
+### Organizations Database
+- **Status:** Ready to receive data
+- **Current Records:** 0 (test data exists in script)
+- **Schema:** 16 fields defined (name, location, category, scope, etc.)
+- **Supabase RLS:** Configured for public read access
+
+### Research Strategy
+- **Documents:** DATA_DISCOVERY_STRATEGY.md, RESEARCH_SOURCES_GUIDE.md
+- **Template:** RESEARCH_STARTER_TEMPLATE.csv
+- **Scraper:** scrape-directories.py (Python automation script)
+- **Target:** 300+ organizations by end of implementation
+
+---
+
+## Next Steps
+
+### Immediate (To Get Build Working)
+1. **Option:** Replace NextUI components OR continue patching errors
+2. **If patching:** Find all remaining component prop mismatches
+3. **Testing:** Verify build succeeds on Vercel
+4. **Deployment:** Get app live
+
+### Short-term (2-3 weeks)
+1. Import organizations data
+2. Test filters and search functionality
+3. Verify map rendering with real data
+4. User acceptance testing
+
+### Medium-term (1 month+)
+1. Implement self-submission form for organizations
+2. Add admin verification workflow
+3. Implement data refresh/update schedule
+4. Optimize performance with real dataset
+
+---
+
+## GitHub Repository
+
+**URL:** https://github.com/septapod/communitere-ecosystem-map
+**Branch:** main
+**Latest Commit:** c63f10b - "Fix NextUI Tabs component prop names"
+
+### Recent Commits (This Session)
 ```
-ecosystem-map/
-├── src/
-│   ├── components/
-│   │   ├── Map.tsx                 # Leaflet interactive map
-│   │   ├── MapView.tsx             # Map wrapper with SSR handling
-│   │   ├── OrganizationList.tsx    # List view with detail modal
-│   │   └── icons/
-│   │       └── SearchIcon.tsx      # UI icons
-│   ├── pages/
-│   │   ├── _app.tsx                # App wrapper with NextUI provider
-│   │   └── index.tsx               # Main homepage with all features
-│   ├── lib/
-│   │   └── supabase.ts             # Supabase client & query functions
-│   ├── styles/
-│   │   └── globals.css             # Global Tailwind styles
-│   └── types/
-│       └── index.ts                # TypeScript interfaces
-├── public/                         # Static assets
-├── .env.local                      # Environment variables (local dev)
-├── .env.local.example              # Environment template
-├── .gitignore                      # Git ignore rules
-├── next.config.js                  # Next.js config
-├── tailwind.config.js              # Tailwind CSS config
-├── tsconfig.json                   # TypeScript config
-├── postcss.config.js               # PostCSS config
-├── package.json                    # Dependencies
-├── package-lock.json               # Locked versions
-├── README.md                       # Project overview
-├── SETUP_GUIDE.md                  # Setup instructions
-├── MIGRATION_SCRIPT.md             # Data migration methods
-├── COMMUNITERE_CONTEXT.md          # Communitere reference doc
-├── PROJECT_STATUS.md               # This file
-└── .git/                           # Git repository
+c63f10b - Fix NextUI Tabs component prop names
+86926e7 - Fix NextUI Select TypeScript type mismatch
+2e6c78e - Downgrade to React 18 for NextUI compatibility
+1a29eaa - Fix Supabase .distinct() error - use JavaScript Set deduplication
 ```
 
 ---
 
-## 🚀 Tech Stack
+## Deployment Status
 
-| Component | Technology | Version | Purpose |
-|-----------|-----------|---------|---------|
-| Framework | Next.js | 16.0.1 | React + static generation |
-| Language | TypeScript | 5.9.3 | Type safety |
-| UI Library | NextUI | 2.6.11 | React components |
-| Styling | Tailwind CSS | 4.1.16 | Utility-first CSS |
-| Database | Supabase | 2.78.0 | PostgreSQL + API |
-| Maps | React-Leaflet | 5.0.0 | Interactive mapping |
-| Maps | Leaflet | 1.9.4 | Mapping library |
-| Animations | Framer Motion | 12.23.24 | Smooth transitions |
-| Deployment | Vercel | TBD | Serverless hosting |
-
----
-
-## 🔄 Data Strategy
-
-### Phase 1: Testing (Current)
-- Add 5-10 sample organizations from each Tier 1 category
-- Test all app functionality
-- Verify database performance
-- Check UI/UX on mobile and desktop
-
-### Phase 2: Initial Data Import
-- **Focus:** Tier 1 organizations nationally across entire US
-- **Scope:** Pop-up mutual aid, established mutual aid organizations, CBOs, BIPOC/Indigenous-led networks
-- **Target:** 50-100 organizations to start
-- **Method:** CSV import via Supabase or Node.js migration script
-
-### Phase 3: Expansion
-- Add Tier 2 organizations (strategic partners, fiscal sponsors, maker spaces)
-- Add Tier 3 organizations (funding ecosystem)
-- Geographic focus: Bay Area, Gulf Coast, Appalachia, Vermont, border regions, Pacific NW, Caribbean
-
-### Phase 4: Analysis Layer
-- Once 100+ organizations loaded, evaluate for scoring/verification
-- Use fields: confidence_level, notes, last_verified to track quality
-- Generate reports on network characteristics
-
----
-
-## 📈 Feature Roadmap
-
-### MVP (Current Phase)
-- ✅ List view with search and filtering
-- ✅ Interactive map with markers
-- ✅ Detail modals with full organization info
-- ✅ Responsive design
-- ⏳ Local testing and validation
-
-### Phase 2 (After MVP Testing)
-- Admin panel for adding/editing organizations
-- CSV bulk import
-- Organization verification workflow
-- Confidence scoring display
-
-### Phase 3 (Future Enhancement)
-- User authentication for admin features
-- Organization relationship mapping
-- Advanced filtering (by funding model, leadership diversity, etc.)
-- Export to PDF reports
-- API access for external tools
-- Comments and community notes (with moderation)
-
----
-
-## 🔐 Security & Privacy
+### Vercel
+- **Current Status:** Failed Build ❌
+- **Last Attempt:** Nov 4, 2025, ~12:25 PM
+- **Error:** TypeScript compilation failure
+- **Auto-trigger:** Enabled (pushes to main trigger builds)
 
 ### Environment Variables
-- Credentials stored in `.env.local` (never committed)
-- `.env.local` in `.gitignore` to prevent accidental exposure
-- Supabase public keys are intentionally public (read-only by design)
-
-### Database Security
-- Row Level Security (RLS) enabled
-- Read-only policy for public access
-- No write access from frontend (prevents data corruption)
-- Future admin features will require authentication
-
-### Data Sensitivity
-- Organization information is public by design
-- Database uses neutral terminology to minimize targeting risk
-- No personal data (employees, members) stored
-- No confidential strategy or internal documents stored
+- ✅ NEXT_PUBLIC_SUPABASE_URL configured
+- ✅ NEXT_PUBLIC_SUPABASE_ANON_KEY configured
+- ✅ RLS policies allow public data access
 
 ---
 
-## 🎯 Next Immediate Actions
+## Known Limitations & Technical Debt
 
-### By User
-1. **Run SQL in Supabase** - Create organizations table using provided SQL
-2. **Verify table creation** - Confirm table appears in Supabase dashboard
-
-### By Claude Code (Once Table Created)
-1. Start local dev server (`npm run dev`)
-2. Run through 15-step testing plan
-3. Add sample test data
-4. Debug any issues
-5. Document findings
-6. Get approval to proceed with real data import
+1. **NextUI Deprecation** - Library no longer maintained, should migrate
+2. **React 18 Type Issues** - Strict mode reveals type mismatches
+3. **Component API Errors** - Multiple prop name mismatches likely remain
+4. **No Error Boundary** - Production errors could crash app
+5. **Limited Data Validation** - Minimal client-side validation
+6. **Manual Data Entry Process** - No automated data import workflow yet
 
 ---
 
-## 📝 Key Decisions Made
+## Decision Point
 
-### Schema Decision (November 3, 2025)
-- **Converged:** Two parallel threads merged into one unified approach
-- **Schema Selected:** 16-field "Goldilocks" approach (balanced, not overwhelming)
-- **Language:** All database terminology uses operationally neutral language
-- **Rationale:** Functional enough for quality control, simple enough for quick data entry
+**As of now, we have TWO paths forward:**
 
-### Tier & Geographic Focus (November 2, 2025)
-- **Start with:** Tier 1 organizations
-- **Geographic scope:** Nationally across entire US
-- **Categories:** Pop-up mutual aid, CBOs, BIPOC/Indigenous networks, established mutual aid
+### Path A: Replace UI Framework
+- Clear out all NextUI components
+- Rebuild UI with plain HTML + Tailwind CSS
+- Gets app deployable quickly
+- Simpler long-term maintenance
 
-### UI/UX Approach (November 2, 2025)
-- **Framework:** NextUI (vs. other component libraries)
-- **Design:** Modern, clean, professional
-- **Responsiveness:** Mobile-first approach
+### Path B: Continue Debugging NextUI
+- Fix remaining component prop mismatches one by one
+- Keep polished UI design
+- Higher risk of more errors appearing
+- Time-intensive debugging process
 
----
-
-## 🤝 Related Documents
-
-| Document | Purpose | Location |
-|----------|---------|----------|
-| README.md | Project overview & quick start | /ecosystem-map/README.md |
-| SETUP_GUIDE.md | Detailed setup instructions | /ecosystem-map/SETUP_GUIDE.md |
-| MIGRATION_SCRIPT.md | Data import methods | /ecosystem-map/MIGRATION_SCRIPT.md |
-| COMMUNITERE_CONTEXT.md | Communitere reference | /ecosystem-map/COMMUNITERE_CONTEXT.md |
-| PROJECT_STATUS.md | This file - overall status | /ecosystem-map/PROJECT_STATUS.md |
+**Recommendation:** Path A (Replace NextUI)
+**Rationale:** NextUI is deprecated, causing multiple type issues, and the pattern of errors suggests more exist. Starting fresh with simpler components will be faster and more maintainable.
 
 ---
 
-## 💾 Git Commit History
+## Contact & Context
 
-| Commit | Message | Content |
-|--------|---------|---------|
-| 1 | "Initial commit: Ecosystem Map MVP setup" | Project structure, components, basic setup |
-| 2 | "Add comprehensive setup guide for Supabase and deployment" | SETUP_GUIDE.md |
-| 3 | "Add data migration guide with multiple import methods" | MIGRATION_SCRIPT.md |
-| 4 | "Add comprehensive Communitere Context reference document" | COMMUNITERE_CONTEXT.md |
+This project is part of the Communitere initiative to map mutual aid and community organizing ecosystems across the United States. The MVP aims to create a searchable, filterable database of organizations with map visualization.
 
----
-
-## 📞 Contact & Support
-
-**Project Lead:** Brent Dixon (Communitere Board Member)
-**Current Phase:** Local testing and validation
-**Database Status:** Ready for table creation
-**Expected Completion of MVP Testing:** Within 1-2 work sessions
-
----
-
-## ⚠️ Important Notes
-
-1. **Do NOT commit `.env.local`** - It contains API keys and is in .gitignore
-2. **Supabase credentials are safe to share** - Public keys have read-only access by design
-3. **Database language is intentionally neutral** - Minimize targeting/investigation risk
-4. **MVP must pass testing before real data import** - Quality over speed
-5. **Each work session:** Update this document with latest status
-
----
-
-**Status as of November 3, 2025:**
-✅ Application architecture complete
-✅ Frontend features complete
-✅ Database schema finalized
-⏳ Database table creation (awaiting Supabase setup)
-⏳ Comprehensive testing (ready to start)
-🎯 Ready to proceed with development
-
----
-
-**Document Version:** 1.0
-**Last Updated:** November 3, 2025
-**Next Review:** After database table creation and initial testing complete
+**Last Updated By:** Claude Code
+**Session Duration:** Multiple iterations spanning several hours
+**Outstanding Issues:** 1 critical (build failure)
